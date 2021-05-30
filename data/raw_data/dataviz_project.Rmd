@@ -22,7 +22,7 @@ library(ggthemes)
 library(knitr)
 
 ## set working directory
-knitr::opts_knit$set(root.dir = '/cloud/project')
+knitr::opts_knit$set(root.dir = '/home/getting-started/dataviz_project')
 ```
 
 # Part 1: Exploratory Data Analysis
@@ -35,14 +35,56 @@ The data we'll be using for this part of the project were downloaded from [kaggl
 First, we'll read the data in from our `data/raw_data` directory.
 
 ```{r pet-data, warning=FALSE} 
-pets <- read.csv("data/raw_data/seattle_pet_licenses.csv", stringsAsFactors = FALSE)
+pets <- read.csv("seattle_pet_licenses.csv", stringsAsFactors = FALSE)
 ```
 
 ## Explore the Data
 
 ```{r pet-explore, warning=FALSE} 
 ## Include code here to explore the data 
-## and answer the questions in the exercise
+class(pets)
+
+str(pets)
+
+dim(pets)
+
+nrow(pets)
+
+ncol(pets)
+
+names(pets)
+
+summary(pets)
+
+head(pets)
+
+tail(pets)
+
+View(pets)
+
+
+# question 1 how many pet licenses are included in the dataset?
+class(pets$license_number) # it's a list so use length on it
+
+length(pets$license_number)
+
+# question 2 how many unique pet names are included in the dataset (animal_s_name)
+
+class(unique(pets$animal_s_name))  # it's a list so use length on it
+
+length(unique(pets$animal_s_name))
+
+
+# question 3 how many different species are included in this dataset (species)?
+class(pets$species)
+
+length(unique(pets$species))
+
+# question 4 which species are not included in the dataset (dog, primate, cat, livestock)?
+
+unique(pets$species)
+
+
 ```
 
 ## Visualize the Data
@@ -50,24 +92,50 @@ pets <- read.csv("data/raw_data/seattle_pet_licenses.csv", stringsAsFactors = FA
 ```{r pet-barchart, warning=FALSE} 
 ## visual breakdown of how many of each species 
 ## are included in the dataset
-ggplot(DATASET) +
-  geom_bar(aes(x=VARIABLE))
+ggplot(pets) +
+  geom_bar(aes(x=species))
+
+
+
+
+
+# question 5 Are there more dog or cat licenses?
+
+tabyl(pets, species)
+
 ```
+
+
+
 
 ```{r pet-cat-table, warning=FALSE} 
 ## Table: Most frequent Cat Name 
-DATASET %>% 
-  filter(species == "SPECIES", VARIABLE != "") %>%
-  group_by(VARIABLE) %>% 
+pets %>% 
+  filter(species == "Cat", animal_s_name != "") %>%
+  group_by(animal_s_name) %>% 
   summarise(n = n()) %>% 
   arrange(-n) %>%
   top_n(n = 10) %>%
   knitr::kable(., caption = "Top 10 Cat Names in Seattle")
+
+
+names(pets)
+
 ```
 
 ```{r pet-dog-table, warning=FALSE} 
 ## Table: Most frequent Dog Name
 ## ADD CODE!
+
+pets %>%
+  filter(species == "Dog", animal_s_name != "") %>%
+  group_by(animal_s_name) %>%
+  summarise(n=n()) %>%
+  arrange(-n) %>%
+  top_n(10) %>%
+  kable(., caption = "The 10 Top Dog Names in Seattle")
+
+
 ```
 
 ```{r pet-linechart, warning=FALSE} 
@@ -86,6 +154,20 @@ pets %>%
   geom_GEOM() +
   scale_x_yearmon() + 
   xlab("") + 
+  ylab("Number of licenses")
+
+names(pets)
+head(pets)
+
+colnames(pets)
+
+pets %>%
+  group_by(ym) %>%
+  summarise(n=n()) %>%
+  ggplot(., aes(ym, n)) +
+  geom_line() +
+  scale_x_yearmon() +
+  xlab("") +
   ylab("Number of licenses")
 ```
 
