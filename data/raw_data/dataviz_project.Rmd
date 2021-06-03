@@ -5,6 +5,11 @@ date: "6/19/2018"
 output: html_document
 ---
 
+```{r}
+
+```
+
+
 ```{r setup, include=FALSE}
 ## install packages if necessary
 list.of.packages <- c("janitor", "ggplot2", "dplyr", "lubridate", "zoo", "forcats", "ggthemes", "knitr", "rmarkdown")
@@ -22,7 +27,7 @@ library(ggthemes)
 library(knitr)
 
 ## set working directory
-knitr::opts_knit$set(root.dir = '/home/getting-started/dataviz_project')
+## knitr::opts_knit$set(root.dir = '/home/getting-started/dataviz_project')
 ```
 
 # Part 1: Exploratory Data Analysis
@@ -40,28 +45,10 @@ pets <- read.csv("seattle_pet_licenses.csv", stringsAsFactors = FALSE)
 
 ## Explore the Data
 
-```{r pet-explore, warning=FALSE} 
+```{r} 
 ## Include code here to explore the data 
-class(pets)
-
-str(pets)
-
-dim(pets)
-
-nrow(pets)
-
-ncol(pets)
-
-names(pets)
 
 summary(pets)
-
-head(pets)
-
-tail(pets)
-
-View(pets)
-
 
 # question 1 how many pet licenses are included in the dataset?
 class(pets$license_number) # it's a list so use length on it
@@ -119,7 +106,7 @@ pets %>%
   knitr::kable(., caption = "Top 10 Cat Names in Seattle")
 
 
-names(pets)
+# names(pets)
 
 ```
 
@@ -142,24 +129,11 @@ pets %>%
 ## add date and ym columns
 pets$date <- lubridate::ymd_hms(pets$license_issue_date)
 pets$ym <- as.yearmon(pets$date, "%y%m")
+```
 
 ## how the number of licenses recorded has changed over time
-pets %>%
-  ## group by yearmonth (`ym`)
-  function_name(VARIABLE) %>% 
-  ## count number within each group
-  function_name(n=n()) %>%
-  ggplot(., aes(VARIABLE, n)) + 
-  ## geom name for line chart
-  geom_GEOM() +
-  scale_x_yearmon() + 
-  xlab("") + 
-  ylab("Number of licenses")
 
-names(pets)
-head(pets)
-
-colnames(pets)
+```{r}
 
 pets %>%
   group_by(ym) %>%
@@ -170,6 +144,7 @@ pets %>%
   xlab("") +
   ylab("Number of licenses")
 ```
+
 
 ```{r pet-plot, warning=FALSE} 
 ### Explore the data -- create your own plot!
@@ -184,7 +159,7 @@ The data used in this part of the project were dowloaded from [FiveThirtyEight](
 
 ```{r meat-data, warning=FALSE} 
 ## read in the data
-steak <- read.csv("data/raw_data/steak-risk-survey.csv", stringsAsFactors = FALSE) %>%
+steak <- read.csv("steak-risk-survey.csv", stringsAsFactors = FALSE) %>%
   ## remove first row which just includes the word "Response" in each column
   slice(2:n())
 ```
@@ -194,12 +169,45 @@ steak <- read.csv("data/raw_data/steak-risk-survey.csv", stringsAsFactors = FALS
 ```{r meat-explore, warning=FALSE} 
 ## Include code here to explore the data 
 ## and answer the questions in the exercise
+
+# class(steak)
+
+# dim(steak)
+
+# nrow(steak)
+
+# ncol(steak)
+
+# names(steak)
+
+# tabyl(steak, )
+
+# head(steak)
+
+# summary(steak)
+
+# Q 13 Which piece of information was NOT collected about the steak survey respondents?
+
+# names(steak)
+
+# Q 14 How many people responded “Yes” to the question “Do you eat steak?”
+
+# names(steak)
+
+# tabyl(steak, "Do.you.eat.steak.")
+
+# Q 15 How many different (unique) responses were there to the question “How do you like your steak prepared?”
+
+# unique(steak$How.do.you.like.your.steak.prepared.)
+
+
+
 ```
 
 ## Wrangle the Data
 
 ```{r meat-wrangle, warning=FALSE} 
-## wrangle the steak data set
+## wrangle the steak data setgroup_
 pref <- steak %>% 
   mutate(steak_pref = factor(How.do.you.like.your.steak.prepared.,
                              levels = c("Well",
@@ -211,15 +219,26 @@ pref <- steak %>%
   group_by(steak_pref) %>% 
   summarise(n = n()) %>%
   mutate(prop = n / sum(n))
+
+# ncol(pref)
+
+# head(pref)
+
+# head(pref$prop)
+
+# head(pref$n)
+
 ```
 
 ## Visualize the Data
 
-```{r meat-visualize, warning=FALSE}
+## generate the plot 
+```{r}
+## copy of the code chunk above with the function_name replaced
 ## generate the plot 
 p <- ggplot(pref) +
   ## specify you want to generate a bar chart
-  function_name(aes(x = steak_pref, y = prop, fill = steak_pref),
+  geom_bar(aes(x = steak_pref, y = prop, fill = steak_pref),
                 stat = 'identity', 
                 width = 0.7) + 
   ## this adds text labels (you don't have to change anything here)
@@ -231,32 +250,32 @@ p <- ggplot(pref) +
             size = 5,
             color = "grey40") +
   ## flip coordinates to make horizontal box plot
-  function_name() +
+  coord_flip() +
   ## change the colors of the bars
-  function_name(values = c("#370B01", 
+  scale_fill_manual(values = c("#370B01", 
                            "#70402C",
                            "#955732", 
                            "#B36153",
                            "#B5413F")) +
   ## change the scale/labels of the steak-wellness variable (x-axis)
-  function_name(limits = levels(fct_rev(pref$steak_pref)),
+  scale_x_discrete(limits = levels(fct_rev(pref$steak_pref)),
                 labels = c("Well", 
                            "Medium Well" = "Medium-well",
                            "Medium",
                            "Medium rare"="Medium-rare",
                            "Rare")) +
   ## change the scale/lables of the percent axis (y-axis)
-  function_name(labels = scales::percent, 
+  scale_y_continuous(labels = scales::percent, 
                 expand = c(mult = c(0,0), 
                            add = c(0,0.035))) +
   ## change the title, subtitle, and caption
-  function_name(title="'How Do You Like Your Steak Prepared?'", 
+  labs(title="'How Do You Like Your Steak Prepared?'", 
                 subtitle="From a survey of 432 steak-eating Americans",
                 caption="FiveThirtyEight: Surveymonkey") +
   ## change the theme (use ggthemes)
-  function_name() +
+  theme_bw() +
   ## fine tune the theme
-  function_name(axis.text = element_text(size = 14), 
+  theme(axis.text = element_text(size = 14), 
                 title = element_text(size = 16), 
                 legend.position="none", 
                 plot.caption=element_text(size = 12), 
@@ -272,7 +291,7 @@ p
 
 ```{r save-plot, warning=FALSE}
 ## save plot to figures/explanatory_figures directory
-ggsave(plot = OBJECT_NAME, filename = FILENAME, width = 8, height = 4)
+ggsave(plot = p, filename = "steak_R.png", width = 8, height = 4)
 ```
 
 ## Visualize the Data
@@ -286,5 +305,5 @@ ggsave(plot = OBJECT_NAME, filename = FILENAME, width = 8, height = 4)
 
 ```{r save-meat-plot, warning=FALSE}
 ## save plot to figures/explanatory_figures directory
-ggsave(plot = OBJECT_NAME, filename = DIFFERENT_FILENAME)
+# ggsave(plot = OBJECT_NAME, filename = DIFFERENT_FILENAME)
 ```
